@@ -1,28 +1,28 @@
-# FlowScroll - Advanced Automation Tool
+# FlowScroll - Auto-Clicker & Auto-Scroller
 
-FlowScroll is a modern, lightweight, and powerful automation utility for Windows designed to automate repetitive mouse clicks and scrolling actions. Whether for gaming, reading long documents, or workflow automation, FlowScroll provides key features missing from standard auto-clickers in a sleek, dark-themed interface.
+FlowScroll is a modern, lightweight utility for Windows designed to automate repetitive mouse clicks and scrolling actions. Whether for reading long documents or simple tasks, FlowScroll provides key features in a sleek, dark-themed interface.
 
-## ✨ Key Features
+## Key Features
 
-### 🖱️ Advanced Auto-Clicker
+### Auto-Clicker
 - **Modes:** Fixed Rate (CPS) or Random Interval (human-like behavior).
 - **Click Types:** Single, Double.
 - **Buttons:** Left, Right, Middle.
 - **Smart Pause:** Automatically pauses clicking when you move the mouse manually, then resumes.
 
-### 📜 Auto-Scroller
+### Auto-Scroller
 - **Multi-Directional:** Scroll Up, Down, Left, Right + Diagonals.
 - **Configurable Speed:** Precise lines per second control.
 - **Stop Conditions:** Stop automatically after X lines or Y seconds.
 
-### 🎨 Modern Interface & Experience
+### Modern Interface & Experience
 - **Dark Mode:** Native Windows 10/11 Dark Mode integration (including title bar).
 - **Overlay:** Minimalist HUD to see status while in-game or full-screen.
 - **Profiles:** Save and load different configurations for different tasks/games.
 - **Global Hotkeys:** Start/Stop actions without leaving your active window.
 - **Safe:** No installation required (portable), open-source base.
 
-## 📥 Download & Installation
+## Download & Installation
 
 ### Option 1: Installer (Recommended)
 Download the latest **Setup.exe** from the [Releases Page](https://github.com/EnneiteG/FlowScroll/releases).
@@ -31,7 +31,7 @@ Download the latest **Setup.exe** from the [Releases Page](https://github.com/En
 ### Option 2: Portable
 Download **FlowScroll.exe** directly from the releases page and run it anywhere.
 
-## 🚀 Getting Started
+## Getting Started
 
 1.  **Launch FlowScroll**.
 2.  **Select a Tool:** Choose the "Auto-Clicker" or "Auto-Scroller" tab.
@@ -39,37 +39,7 @@ Download **FlowScroll.exe** directly from the releases page and run it anywhere.
 4.  **Set Hotkeys:** Go to Settings (Gear Icon) to customize Start/Stop keys (Default: **F9** for Scroll, **F10** for Click).
 5.  **Start:** Press the hotkey or the "Start" button.
 
-## ❤️ Support the Project
-
-FlowScroll is developed as a free tool for the community. If it helps you in your daily tasks or games, consider supporting development!
-
-<a href="https://gumroad.com/YOUR_LINK_HERE" target="_blank">
-  <img src="https://img.shields.io/badge/Support-Buy%20Me%20A%20Coffee-orange?style=for-the-badge&logo=buy-me-a-coffee" alt="Support" />
-</a>
-
-## 🛠️ For Developers (Build from Source)
-
-Requirements: Python 3.10+, pip.
-
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/EnneiteG/FlowScroll.git
-    cd FlowScroll
-    ```
-2.  Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
-3.  Run the application:
-    ```bash
-    python run_app.py
-    ```
-4.  Build executable (Windows):
-    ```powershell
-    .\build_release.ps1
-    ```
-
-## 📄 License
+## License
 
 This project is open-source. See the LICENSE file for details.
 

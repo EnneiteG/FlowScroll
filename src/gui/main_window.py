@@ -61,7 +61,7 @@ class AboutDialog(QDialog):
         layout.addWidget(label_title)
 
         # Description
-        label_desc = QLabel("Advanced Automation Tool")
+        label_desc = QLabel("Auto-Clicker & Auto-Scroller")
         label_desc.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(label_desc)
         
