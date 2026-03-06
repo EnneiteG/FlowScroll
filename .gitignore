@@ -1,0 +1,28 @@
+# Dependencies
+__pycache__/
+.venv/
+.pytest_cache/
+*.pyc
+
+# Distribution
+dist/
+build/
+*.spec
+*.log
+release/
+crash.log
+run_v2.txt
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# FlowScroll specific
+*.wixobj
+*.wixpdb
+*.msi
+FlowScroll_Setup_*.exe
