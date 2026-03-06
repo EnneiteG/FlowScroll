@@ -4,7 +4,7 @@
 #define MyAppName "FlowScroll"
 #define MyAppVersion "0.1.0"
 #define MyAppPublisher "FlowScroll Team"
-#define MyAppURL "https://github.com/etienne-m/FlowScroll"
+#define MyAppURL "https://github.com/EnneiteG/FlowScroll"
 #define MyAppExeName "FlowScroll.exe"
 
 [Setup]
