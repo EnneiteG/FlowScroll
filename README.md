@@ -5,7 +5,7 @@ FlowScroll is a modern, lightweight utility for Windows designed to automate rep
 ## Key Features
 
 ### Auto-Clicker
-- **Modes:** Fixed Rate (CPS) or Random Interval (human-like behavior).
+- **Modes:** Fixed Rate (CPS) or Random Interval.
 - **Click Types:** Single, Double.
 - **Buttons:** Left, Right, Middle.
 - **Smart Pause:** Automatically pauses clicking when you move the mouse manually, then resumes.
@@ -16,7 +16,7 @@ FlowScroll is a modern, lightweight utility for Windows designed to automate rep
 - **Stop Conditions:** Stop automatically after X lines or Y seconds.
 
 ### Modern Interface & Experience
-- **Dark Mode:** Native Windows 10/11 Dark Mode integration (including title bar).
+- **Dark Mode:** Native Windows 10/11 Dark Mode integration.
 - **Overlay:** Minimalist HUD to see status while in-game or full-screen.
 - **Profiles:** Save and load different configurations for different tasks/games.
 - **Global Hotkeys:** Start/Stop actions without leaving your active window.
