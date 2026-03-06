@@ -41,7 +41,7 @@ Download **FlowScroll.exe** directly from the releases page and run it anywhere.
 
 ## License
 
-This project is open-source. See the LICENSE file for details.
+This project is open-source under the GNU General Public License v3.0 (GPLv3). See the LICENSE file for details.
 
 ---
 **Disclaimer:** Use responsibly. The developers are not responsible for bans in online games. Always check the terms of service of the software you are automating.
