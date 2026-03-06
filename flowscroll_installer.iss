@@ -20,8 +20,8 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
-; Remove the following line to run in administrative install mode (install for all users.)
-PrivilegesRequired=lowest
+; Run in administrative install mode (install for all users.)
+PrivilegesRequired=admin
 OutputDir=release
 OutputBaseFilename=FlowScroll_Setup_v{#MyAppVersion}
 Compression=lzma
