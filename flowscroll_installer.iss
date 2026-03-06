@@ -24,6 +24,7 @@ DisableProgramGroupPage=yes
 PrivilegesRequired=admin
 OutputDir=release
 OutputBaseFilename=FlowScroll_Setup_v{#MyAppVersion}
+LicenseFile=LICENSE
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
