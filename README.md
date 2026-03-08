@@ -1,6 +1,7 @@
 # FlowScroll - Auto-Clicker & Auto-Scroller
 
-FlowScroll is a modern, lightweight utility for Windows designed to automate repetitive mouse clicks and scrolling actions. Ideal for reading long documents or simple tasks.
+FlowScroll is a modern, lightweight utility for Windows designed to automate repetitive mouse clicks and scrolling actions. Ideal for reading long documents, gaming, or simple tasks.
+
 
 ## Key Features
 
@@ -42,6 +43,12 @@ Download **FlowScroll.exe** directly from the releases page and run it anywhere.
 ## License
 
 This project is open-source under the GNU General Public License v3.0 (GPLv3). See the LICENSE file for details.
+
+## Support the Project
+
+If FlowScroll saves you time and clicks, consider supporting its development!
+
+[**Support FlowScroll on Gumroad**](https://tymonkey.gumroad.com/l/twsmuk)
 
 ---
 **Disclaimer:** Use responsibly. The developers are not responsible for bans in online games. Always check the terms of service of the software you are automating.
