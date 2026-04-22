@@ -8,6 +8,7 @@ class Clicker(QThread):
     High-performance clicker engine using QThread and pynput.
     """
     stats_updated = pyqtSignal(int)
+    state_changed = pyqtSignal(str)
 
     def __init__(self, button='left', click_type='single', cps=10.0, jitter=0.0, 
                  start_delay=0.0, smart_pause=False, smart_pause_delay=1.0,
@@ -32,6 +33,8 @@ class Clicker(QThread):
         self.stop_value = stop_value
         
         self.click_count = 0
+        self.finish_reason = 'idle'
+        self._last_state = None
         
         self.button_map = {
             'left': Button.left,
@@ -59,17 +62,27 @@ class Clicker(QThread):
         self.stop_value = stop_value
 
     def stop(self):
+        self.finish_reason = 'idle'
         self.running = False
-        self.wait()
+        if QThread.currentThread() != self:
+            self.wait()
+
+    def _emit_state(self, state):
+        if self._last_state != state:
+            self._last_state = state
+            self.state_changed.emit(state)
 
     def run(self):
+        self.finish_reason = 'finished'
         self.running = True
+        self._emit_state('running')
         
         # Start Delay
         if self.start_delay > 0:
             end_delay_time = time.time() + self.start_delay
             while time.time() < end_delay_time:
                 if not self.running:
+                    self._emit_state(self.finish_reason)
                     return
                 # Short sleep to remain responsive
                 time.sleep(0.05)
@@ -99,13 +112,16 @@ class Clicker(QThread):
                 if current_pos != last_mouse_pos:
                     last_mouse_pos = current_pos
                     last_move_time = time.time()
-                    is_paused = True
+                    if not is_paused:
+                        is_paused = True
+                        self._emit_state('paused')
                 
                 if is_paused:
                     if time.time() - last_move_time > self.smart_pause_delay:
                         is_paused = False
                         # Reset next_click_time to avoid burst after resume
                         next_click_time = time.perf_counter()
+                        self._emit_state('running')
                     else:
                         # Paused, so we loop continue. 
                         # Sleep briefly to not spin CPU while paused
@@ -172,3 +188,4 @@ class Clicker(QThread):
                     break
         
         self.stats_updated.emit(self.click_count)
+        self._emit_state(self.finish_reason)

@@ -1,5 +1,6 @@
 import time
 import random
+from typing import cast
 from PyQt6.QtCore import QThread, pyqtSignal
 from pynput.mouse import Controller
 
@@ -8,6 +9,7 @@ class Scroller(QThread):
     High-performance scroller engine using QThread and pynput.
     """
     stats_updated = pyqtSignal(int)
+    state_changed = pyqtSignal(str)
 
     # Direction vectors for scrolling
     # Using 0.7071 (approx 1/sqrt(2)) for diagonals to maintain consistent speed
@@ -37,6 +39,8 @@ class Scroller(QThread):
         self.stop_mode = stop_mode
         self.stop_value = stop_value
         self.scroll_count = 0
+        self.finish_reason = 'idle'
+        self._last_state = None
 
     def update_settings(self, direction, scroll_speed, jitter,
                         start_delay=0.0, smart_pause=False, smart_pause_delay=1.0,
@@ -51,19 +55,28 @@ class Scroller(QThread):
         self.stop_value = stop_value
 
     def stop(self):
+        self.finish_reason = 'idle'
         self.running = False
         # Prevent deadlock if stop() is called from within the running thread
         if QThread.currentThread() != self:
             self.wait()
 
+    def _emit_state(self, state):
+        if self._last_state != state:
+            self._last_state = state
+            self.state_changed.emit(state)
+
     def run(self):
+        self.finish_reason = 'finished'
         self.running = True
+        self._emit_state('running')
         
         # Start Delay
         if self.start_delay > 0:
             end_delay_time = time.time() + self.start_delay
             while time.time() < end_delay_time:
                 if not self.running:
+                    self._emit_state(self.finish_reason)
                     return
                 # Short sleep to remain responsive
                 time.sleep(0.05)
@@ -96,11 +109,11 @@ class Scroller(QThread):
 
             # --- CHECK STOP LIMITS ---
             if self.stop_mode == 'time' and (time.time() - run_start_time) >= self.stop_value:
-                self.stop()
+                self.running = False
                 break
 
             if self.stop_mode == 'count' and self.scroll_count >= self.stop_value:
-                self.stop()
+                self.running = False
                 break
 
             # --- SMART PAUSE LOGIC ---
@@ -109,13 +122,16 @@ class Scroller(QThread):
                 if current_pos != last_mouse_pos:
                     last_mouse_pos = current_pos
                     last_move_time = time.time()
-                    is_paused = True
+                    if not is_paused:
+                        is_paused = True
+                        self._emit_state('paused')
                 
                 if is_paused:
                     if time.time() - last_move_time > self.smart_pause_delay:
                         is_paused = False
                         # Reset loop timing to avoid "catch-up" burst
                         next_frame_time = time.perf_counter()
+                        self._emit_state('running')
                     else:
                         # While paused, sleep a bit and skip processing
                         time.sleep(0.05)
@@ -169,7 +185,7 @@ class Scroller(QThread):
 
             # Send scroll command if valid steps were generated
             if send_x != 0.0 or send_y != 0.0:
-                self.mouse.scroll(send_x, send_y)
+                self.mouse.scroll(cast(int, send_x), cast(int, send_y))
                 
                 # Update statistics (approximate based on sent lines)
                 lines_passed = max(abs(send_x), abs(send_y))
@@ -196,3 +212,5 @@ class Scroller(QThread):
                 # If we are falling behind, don't sleep, but prevent spiral
                 if now - next_frame_time > 0.1:
                     next_frame_time = now
+
+        self._emit_state(self.finish_reason)

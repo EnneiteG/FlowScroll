@@ -7,11 +7,14 @@ __pycache__/
 # Distribution
 dist/
 build/
-*.spec
 *.log
 release/
 crash.log
 run_v2.txt
+
+# Runtime data
+flowscroll_settings.json
+profiles.json
 
 # OS Files
 .DS_Store

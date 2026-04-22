@@ -131,6 +131,7 @@ class MainWindow(QMainWindow):
     # Signals to handle hotkey events from non-GUI thread
     toggle_clicker_signal = pyqtSignal()
     toggle_scroller_signal = pyqtSignal()
+    MAX_DELAY_SECONDS = 999999.0
 
     def __init__(self):
         super().__init__()
@@ -163,6 +164,10 @@ class MainWindow(QMainWindow):
         # Engine instances
         self.clicker = Clicker()
         self.scroller = Scroller()
+        self.clicker_state = "idle"
+        self.scroller_state = "idle"
+        self.clicker_count = 0
+        self.scroller_count = 0
         
         # Overlay
         self.overlay = OverlayWindow()
@@ -175,6 +180,8 @@ class MainWindow(QMainWindow):
         # Connect engine signals
         self.clicker.stats_updated.connect(self.on_clicker_stats)
         self.scroller.stats_updated.connect(self.on_scroller_stats)
+        self.clicker.state_changed.connect(self.on_clicker_state_changed)
+        self.scroller.state_changed.connect(self.on_scroller_state_changed)
         self.clicker.finished.connect(self.on_clicker_finished)
         self.scroller.finished.connect(self.on_scroller_finished)
 
@@ -183,6 +190,8 @@ class MainWindow(QMainWindow):
         
         # Load Settings to UI
         self.load_settings_to_ui()
+        self.refresh_clicker_status()
+        self.refresh_scroller_status()
 
         # Update engines with initial settings
         self.update_clicker_settings()
@@ -361,6 +370,7 @@ class MainWindow(QMainWindow):
         enabled = self.settings.get("enable_overlay", False)
         if enabled:
             self.overlay.show()
+            self.refresh_overlay_status()
         else:
             self.overlay.hide()
             
@@ -496,7 +506,7 @@ class MainWindow(QMainWindow):
         adv_layout = QFormLayout()
 
         self.clicker_start_delay = QDoubleSpinBox()
-        self.clicker_start_delay.setRange(0.0, 10.0)
+        self.clicker_start_delay.setRange(0.0, self.MAX_DELAY_SECONDS)
         self.clicker_start_delay.setSingleStep(0.1)
         self.clicker_start_delay.setValue(3.0)
         self.clicker_start_delay.valueChanged.connect(self.update_clicker_settings)
@@ -506,7 +516,7 @@ class MainWindow(QMainWindow):
         self.clicker_smart_pause.toggled.connect(self.update_clicker_settings)
         
         self.clicker_resume_delay = QDoubleSpinBox()
-        self.clicker_resume_delay.setRange(0.0, 60.0)
+        self.clicker_resume_delay.setRange(0.0, self.MAX_DELAY_SECONDS)
         self.clicker_resume_delay.setSingleStep(0.5)
         self.clicker_resume_delay.setValue(1.0)
         self.clicker_resume_delay.setEnabled(False)
@@ -572,7 +582,7 @@ class MainWindow(QMainWindow):
         adv_layout = QFormLayout()
 
         self.scroller_start_delay = QDoubleSpinBox()
-        self.scroller_start_delay.setRange(0.0, 10.0)
+        self.scroller_start_delay.setRange(0.0, self.MAX_DELAY_SECONDS)
         self.scroller_start_delay.setSingleStep(0.1)
         self.scroller_start_delay.setValue(3.0)
         self.scroller_start_delay.valueChanged.connect(self.update_scroller_settings)
@@ -582,7 +592,7 @@ class MainWindow(QMainWindow):
         self.scroller_smart_pause.toggled.connect(self.update_scroller_settings)
         
         self.scroller_resume_delay = QDoubleSpinBox()
-        self.scroller_resume_delay.setRange(0.0, 60.0)
+        self.scroller_resume_delay.setRange(0.0, self.MAX_DELAY_SECONDS)
         self.scroller_resume_delay.setSingleStep(0.5)
         self.scroller_resume_delay.setValue(1.0)
         self.scroller_resume_delay.setEnabled(False)
@@ -664,6 +674,8 @@ class MainWindow(QMainWindow):
         self.cps_spin.setValue(self.settings.get("click_rate", 10.0))
         self.min_interval_spin.setValue(self.settings.get("click_min_interval", 1.0))
         self.max_interval_spin.setValue(self.settings.get("click_max_interval", 5.0))
+        self.click_type_combo.setCurrentText(self.settings.get("click_type", "single"))
+        self.mouse_btn_combo.setCurrentText(self.settings.get("mouse_button", "left"))
         
         self.clicker_start_delay.setValue(self.settings.get("clicker_start_delay", 3.0))
         self.clicker_smart_pause.setChecked(self.settings.get("clicker_smart_pause", False))
@@ -682,6 +694,7 @@ class MainWindow(QMainWindow):
 
         # Scroller
         self.scroll_speed_spin.setValue(self.settings.get("scroll_speed", 0) if self.settings.get("scroll_speed", 0) > 0 else 10.0)
+        self.scroll_dir_combo.setCurrentText(self.settings.get("scroll_direction", "down"))
 
         self.scroller_start_delay.setValue(self.settings.get("scroller_start_delay", 3.0))
         self.scroller_smart_pause.setChecked(self.settings.get("scroller_smart_pause", False))
@@ -790,16 +803,61 @@ class MainWindow(QMainWindow):
         self.toggle_scroller_state(not is_running)
 
     def on_clicker_stats(self, count):
-        msg = f"Status: Running - {count} clicks"
-        self.clicker_status_label.setText(msg)
-        if self.overlay.isVisible():
-            self.overlay.update_text(f"Clicker: {count}")
+        self.clicker_count = count
+        self.refresh_clicker_status()
 
     def on_scroller_stats(self, count):
-        msg = f"Status: Running - {count} scrolls"
-        self.scroller_status_label.setText(msg)
-        if self.overlay.isVisible():
-            self.overlay.update_text(f"Scroller: {count}")
+        self.scroller_count = count
+        self.refresh_scroller_status()
+
+    @pyqtSlot(str)
+    def on_clicker_state_changed(self, state):
+        previous_state = self.clicker_state
+        self.clicker_state = state
+        if state == "running" and previous_state in {"idle", "finished"}:
+            self.clicker_count = 0
+        self.refresh_clicker_status()
+
+    @pyqtSlot(str)
+    def on_scroller_state_changed(self, state):
+        previous_state = self.scroller_state
+        self.scroller_state = state
+        if state == "running" and previous_state in {"idle", "finished"}:
+            self.scroller_count = 0
+        self.refresh_scroller_status()
+
+    def format_status_label(self, prefix, state, count, unit):
+        if state == "running":
+            return f"{prefix}: Running - {count} {unit}"
+        if state == "paused":
+            return f"{prefix}: Paused - {count} {unit}"
+        if state == "finished":
+            return f"{prefix}: Finished - {count} {unit}"
+        return f"{prefix}: Idle"
+
+    def refresh_clicker_status(self):
+        self.clicker_status_label.setText(
+            self.format_status_label("Clicker", self.clicker_state, self.clicker_count, "clicks")
+        )
+        self.refresh_overlay_status()
+
+    def refresh_scroller_status(self):
+        self.scroller_status_label.setText(
+            self.format_status_label("Scroller", self.scroller_state, self.scroller_count, "scrolls")
+        )
+        self.refresh_overlay_status()
+
+    def refresh_overlay_status(self):
+        if not self.overlay.isVisible():
+            return
+
+        parts = []
+        if self.clicker_state != "idle":
+            parts.append(self.format_status_label("Clicker", self.clicker_state, self.clicker_count, "clicks"))
+        if self.scroller_state != "idle":
+            parts.append(self.format_status_label("Scroller", self.scroller_state, self.scroller_count, "scrolls"))
+
+        self.overlay.update_text(" | ".join(parts) if parts else "FlowScroll: Ready")
 
     def setup_hotkeys(self):
         # Read from settings or default
@@ -1005,10 +1063,13 @@ class MainWindow(QMainWindow):
     def block_signals(self, block):
         # Helper to block/unblock signals for all input widgets
         widgets = [
-            self.cps_spin, self.click_type_combo, self.mouse_btn_combo,
+            self.click_mode_combo, self.cps_spin, self.min_interval_spin, self.max_interval_spin,
+            self.click_type_combo, self.mouse_btn_combo,
             self.clicker_start_delay, self.clicker_smart_pause, self.clicker_resume_delay,
+            self.click_stop_mode_combo, self.click_stop_value_spin,
             self.scroll_speed_spin, self.scroll_dir_combo,
-            self.scroller_start_delay, self.scroller_smart_pause, self.scroller_resume_delay
+            self.scroller_start_delay, self.scroller_smart_pause, self.scroller_resume_delay,
+            self.scroll_stop_mode_combo, self.scroll_stop_value_spin
         ]
         for w in widgets:
             w.blockSignals(block)
@@ -1018,14 +1079,14 @@ class MainWindow(QMainWindow):
     def on_clicker_finished(self):
         if self.start_clicker_btn.isChecked():
             self.start_clicker_btn.setChecked(False)
-            self.start_clicker_btn.setText("Start Auto-Clicker")
-            self.clicker_status_label.setText("Status: Stopped - Finished")
+        self.start_clicker_btn.setText("Start Auto-Clicker")
+        self.refresh_clicker_status()
 
     def on_scroller_finished(self):
         if self.start_scroller_btn.isChecked():
             self.start_scroller_btn.setChecked(False)
-            self.start_scroller_btn.setText("Start Auto-Scroller")
-            self.scroller_status_label.setText("Status: Stopped - Finished")
+        self.start_scroller_btn.setText("Start Auto-Scroller")
+        self.refresh_scroller_status()
 
     def perform_cleanup(self):
         # Save settings on close
@@ -1033,6 +1094,8 @@ class MainWindow(QMainWindow):
         self.settings["click_min_interval"] = self.min_interval_spin.value()
         self.settings["click_max_interval"] = self.max_interval_spin.value()
         self.settings["click_rate"] = self.cps_spin.value()
+        self.settings["click_type"] = self.click_type_combo.currentText()
+        self.settings["mouse_button"] = self.mouse_btn_combo.currentText()
         self.settings["clicker_start_delay"] = self.clicker_start_delay.value()
         self.settings["clicker_smart_pause"] = self.clicker_smart_pause.isChecked()
         self.settings["clicker_resume_delay"] = self.clicker_resume_delay.value()
@@ -1047,6 +1110,7 @@ class MainWindow(QMainWindow):
         self.settings["click_stop_value"] = self.click_stop_value_spin.value()
 
         self.settings["scroll_speed"] = self.scroll_speed_spin.value()
+        self.settings["scroll_direction"] = self.scroll_dir_combo.currentText()
         self.settings["scroller_start_delay"] = self.scroller_start_delay.value()
         self.settings["scroller_smart_pause"] = self.scroller_smart_pause.isChecked()
         self.settings["scroller_resume_delay"] = self.scroller_resume_delay.value()

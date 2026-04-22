@@ -5,6 +5,9 @@ from PyQt6.QtWidgets import QApplication
 
 # Ensure project root is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+
+from src.core.version import APP_VERSION
 
 @pytest.fixture(scope="session")
 def qapp():
@@ -27,7 +30,7 @@ def test_mainwindow_title(qapp):
     try:
         from src.gui.main_window import MainWindow
         window = MainWindow()
-        assert window.windowTitle() == "FlowScroll"
+        assert window.windowTitle() == f"FlowScroll v{APP_VERSION}"
         window.close()
     except ImportError as e:
         pytest.fail(f"Could not import MainWindow: {e}")

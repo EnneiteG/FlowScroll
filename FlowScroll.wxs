@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="*" Name="FlowScroll" Language="1033" Version="0.1.0.0" Manufacturer="FlowScroll Team" UpgradeCode="5d0e68ce-fac6-4b8c-94f5-85a2e35fc843">
+    <Product Id="*" Name="FlowScroll" Language="1033" Version="0.1.1.0" Manufacturer="FlowScroll Team" UpgradeCode="5d0e68ce-fac6-4b8c-94f5-85a2e35fc843">
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />

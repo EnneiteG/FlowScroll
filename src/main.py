@@ -22,21 +22,24 @@ except ImportError as e:
 
 def setup_environment():
     """Setup logging and other environment checks."""
+    log_dir = ConfigManager.get_logs_dir()
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
-            logging.StreamHandler(sys.stdout)
+            logging.StreamHandler(sys.stdout),
+            logging.FileHandler(os.path.join(log_dir, 'flowscroll.log'), encoding='utf-8')
         ]
     )
-    # Ensure logs directory exists if we want file logging
-    log_dir = os.path.join(project_root, 'logs')
-    os.makedirs(log_dir, exist_ok=True)
-    
-    # Add file handler
-    file_handler = logging.FileHandler(os.path.join(log_dir, 'flowscroll.log'))
-    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-    logging.getLogger().addHandler(file_handler)
+
+
+def enforce_single_instance(shared_memory, parent=None):
+    if shared_memory.create(1):
+        return True
+
+    logging.warning("Another FlowScroll instance is already running.")
+    QMessageBox.warning(parent, "FlowScroll", "FlowScroll is already running.")
+    return False
 
 def main():
     setup_environment()
@@ -45,22 +48,9 @@ def main():
     app = QApplication(sys.argv)
     app.setApplicationName("FlowScroll")
 
-    # Single Instance Lock
-    # shared_memory = QSharedMemory("FlowScrollRunningLock")
-    # Using a simple file-based lock might be more reliable on Windows restart
-    # temporarily bypassing strict lock check to ensure startup
-    shared_memory = QSharedMemory("FlowScrollRunningLock_v3")
-    if not shared_memory.create(1):
-        if shared_memory.attach():
-            pass # We attached to verify it exists
-        logging.warning("Another instance might be running (SharedMemory check failed). Continuing anyway for safety.")
-        # msg = QMessageBox()
-        # msg.setIcon(QMessageBox.Icon.Warning)
-        # msg.setWindowTitle("FlowScroll")
-        # msg.setText("FlowScroll is already running!")
-        # msg.setStandardButtons(QMessageBox.StandardButton.Ok)
-        # msg.exec()
-        # sys.exit(0) # BYPASS EXIT to force launch
+    shared_memory = QSharedMemory("FlowScrollRunningLock_v4")
+    if not enforce_single_instance(shared_memory):
+        sys.exit(0)
 
     
     # Load Config to get Theme

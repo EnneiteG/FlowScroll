@@ -1,54 +1,57 @@
 # FlowScroll - Auto-Clicker & Auto-Scroller
 
-FlowScroll is a modern, lightweight utility for Windows designed to automate repetitive mouse clicks and scrolling actions. Ideal for reading long documents, gaming, or simple tasks.
+FlowScroll is a Windows desktop utility for automating mouse clicks and scrolling with a PyQt6 interface, local profiles, and quick local test builds.
 
+## Features
 
-## Key Features
+- Auto-clicker with fixed-rate or random-interval modes.
+- Auto-scroller with vertical, horizontal, and diagonal directions.
+- Smart pause that pauses on manual mouse movement and resumes after a configurable delay.
+- Stop conditions based on time or count.
+- Per-user settings and profiles stored in LocalAppData.
+- Optional overlay, global hotkeys, tray icon, and update checker.
 
-### Auto-Clicker
-- **Modes:** Fixed Rate (CPS) or Random Interval.
-- **Click Types:** Single, Double.
-- **Buttons:** Left, Right, Middle.
-- **Smart Pause:** Automatically pauses clicking when you move the mouse manually, then resumes.
+## Local Development
 
-### Auto-Scroller
-- **Multi-Directional:** Scroll Up, Down, Left, Right + Diagonals.
-- **Configurable Speed:** Precise lines per second control.
-- **Stop Conditions:** Stop automatically after X lines or Y seconds.
+Install dependencies:
 
-### Modern Interface & Experience
-- **Dark Mode:** Native Windows 10/11 Dark Mode integration.
-- **Overlay:** Minimalist HUD to see status while in-game or full-screen.
-- **Profiles:** Save and load different configurations for different tasks/games.
-- **Global Hotkeys:** Start/Stop actions without leaving your active window.
-- **Safe:** No installation required (portable), open-source base.
+```powershell
+python -m pip install -r requirements.txt
+```
 
-## Download & Installation
+Run from source:
 
-### Option 1: Installer (Recommended)
-Download the latest **Setup.exe** from the [Releases Page](https://github.com/EnneiteG/FlowScroll/releases).
-- This will install FlowScroll to your computer, create shortcuts, and allow for easy updates.
+```powershell
+python run_app.py
+```
 
-### Option 2: Portable
-Download **FlowScroll.exe** directly from the releases page and run it anywhere.
+## Local Build Workflow
 
-## Getting Started
+Create a local Windows build:
 
-1.  **Launch FlowScroll**.
-2.  **Select a Tool:** Choose the "Auto-Clicker" or "Auto-Scroller" tab.
-3.  **Configure:** Set your desired speed (CPS) or scroll rate.
-4.  **Set Hotkeys:** Go to Settings (Gear Icon) to customize Start/Stop keys (Default: **F9** for Scroll, **F10** for Click).
-5.  **Start:** Press the hotkey or the "Start" button.
+```powershell
+.\build_release.ps1
+```
+
+- The local test executable is written to `release/FlowScroll.exe`.
+- Use `release/FlowScroll.exe` to test new builds quickly without reinstalling the app.
+- The installer output in `release/` is for packaging and distribution, not for every test cycle.
+
+## Runtime Data
+
+FlowScroll stores writable runtime data in `%LocalAppData%\FlowScroll`:
+
+- `flowscroll_settings.json`
+- `profiles.json`
+- `logs\flowscroll.log`
+
+On first launch, existing legacy files found next to the source tree or executable are copied into the per-user data directory automatically.
+
+## Release Artifacts
+
+- `FlowScroll.spec` is versioned and used by `build_release.ps1`.
+- `flowscroll_installer.iss` and `FlowScroll.wxs` package the executable from `release/FlowScroll.exe`.
 
 ## License
 
-This project is open-source under the GNU General Public License v3.0 (GPLv3). See the LICENSE file for details.
-
-## Support the Project
-
-If FlowScroll saves you time and clicks, consider supporting its development!
-
-[**Support FlowScroll on Gumroad**](https://tymonkey.gumroad.com/l/twsmuk)
-
----
-**Disclaimer:** Use responsibly. The developers are not responsible for bans in online games. Always check the terms of service of the software you are automating.
+This project is licensed under the GNU General Public License v3.0. See `LICENSE`.
